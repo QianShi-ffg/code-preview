@@ -8,26 +8,20 @@
       <!-- <router-view></router-view> -->
       <div class="main-left"></div>
       <div class="main-right">
-        <div class="editor">
+        <div class="editor" ref="editorList">
           <div class="editor-item item-html">
             <div class="editor-item-header" data-title="html"></div>
-            <div class="editor-item-content">
-              <Editor language="html" v-model="content.html"/>
-            </div>
+            <Editor ref="editorBox" language="html" v-model="content.html" />
           </div>
           <splitMove direction="horizontal"></splitMove>
           <div class="editor-item item-css">
             <div class="editor-item-header" data-title="css"></div>
-            <div class="editor-item-content">
-              <Editor language="css" v-model="content.css"/>
-            </div>
+            <Editor ref="editorBox" language="css" v-model="content.css" />
           </div>
           <splitMove direction="horizontal"></splitMove>
           <div class="editor-item item-js">
             <div class="editor-item-header" data-title="javascript"></div>
-            <div class="editor-item-content">
-              <Editor language="javascript" v-model="content.js"/>
-            </div>
+            <Editor ref="editorBox" language="javascript" v-model="content.js" />
           </div>
         </div>
         <splitMove direction="vertical"></splitMove>
@@ -40,7 +34,7 @@
 <script setup lang="ts">
 import Editor from '../components/editor.vue'
 import splitMove from '../components/splitMove.vue'
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, watch, watchEffect, watchSyncEffect, computed, nextTick } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 const router = useRouter();
 const route = useRoute();
@@ -49,15 +43,13 @@ const backToHome = () => {
   router.push('/');
 };
 
+const editorList = ref<Element | Node | undefined>();
+
 const preview = ref<any>();
 const content = reactive<any>({
   html: '',
   css: '',
   js: ''
-})
-
-onMounted(() => {
-  // init();
 })
 
 const init = () => {
@@ -70,6 +62,8 @@ const init = () => {
   iframeDoc?.write(iframeContent);
   iframeDoc?.close();
 }
+
+
 </script>
 
 <style scoped lang="scss">
@@ -77,6 +71,7 @@ const init = () => {
   width: 100%;
   height: 100vh;
   overflow: hidden;
+
   .header {
     display: flex;
     align-items: center;
@@ -134,22 +129,26 @@ const init = () => {
       cursor: pointer;
       transition: box-shadow 0.4s, translateY 0.2s;
       color: #a174e7;
+
       &:hover {
-        box-shadow: 0 0 5px 0 inset #c9c9ea,0 0 10px 5px inset #a174e7,0 0 3px 0px #a174e7;
+        box-shadow: 0 0 5px 0 inset #c9c9ea, 0 0 10px 5px inset #a174e7, 0 0 3px 0px #a174e7;
         // background: radial-gradient(#c9c9ea, #a174e7);
       }
+
       &:active {
         transform: scale(1.05);
         // background: radial-gradient(#c9c9ea, #a174e7);
       }
     }
   }
+
   .main {
     display: flex;
     align-items: center;
     justify-content: space-between;
     width: 100%;
     height: calc(100% - 64px);
+
     .main-right {
       height: 100%;
       min-width: 100vw;
@@ -158,13 +157,16 @@ const init = () => {
       flex-direction: column;
       justify-content: space-between;
       align-items: flex-start;
+
       .editor {
         display: flex;
         justify-content: flex-start;
         width: 100%;
         height: 45%;
+
         .editor-item {
           width: calc((100% - 30px) / 3);
+
           .editor-item-header {
             width: 100%;
             height: 24px;
@@ -172,6 +174,7 @@ const init = () => {
             text-align: left;
             padding-left: 50px;
             box-sizing: border-box;
+
             &::before {
               display: inline-block;
               height: 100%;
@@ -180,12 +183,9 @@ const init = () => {
               background: #f8f8f8;
             }
           }
-          .editor-item-content {
-            width: 100%;
-            height: calc(100% - 24px);
-          }
         }
       }
+
       .preview {
         width: 100%;
         flex: 1;
@@ -193,5 +193,4 @@ const init = () => {
       }
     }
   }
-}
-</style>
+}</style>

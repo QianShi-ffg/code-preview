@@ -36,7 +36,8 @@ const defaultOpts = reactive<any>({
   automaticLayout: true,
   contextmenu: false, // 右键菜单
   acceptSuggestionOnEnter: "on",
-  lineNumbers: "on", // 行号
+  lineNumbers: 'on', 
+  lineNumbersMinChars: 4,
   foldingStrategy: "indentation", // 代码可分小段折叠
   folding: true, // 是否启用代码折叠
   cursorBlinking: 'smooth', // 光标动画样式
@@ -44,6 +45,8 @@ const defaultOpts = reactive<any>({
   minimap: {
     enabled: false, // 关闭代码缩略图
   },
+  overflow: 'hidden', // 隐藏溢出内容，包括横向滚动条
+  wordWrap: 'bounded', // 开启单词换行
 });
 
 onMounted(() => {
@@ -89,12 +92,18 @@ const init = () => {
     contentChanged.value = true;
   });
 };
+
+// const mResize = () => {
+//   setTimeout(() => {
+//     monacoDiffInstance.value?.layout()
+//   }, 500); // 在 200 毫秒后执行 layout
+// }
 </script>
 
 <style scoped lang="scss">
 .editorBox {
   width: 100%;
-  height: 100%;
+  height: calc(100% - 24px);
   :deep(.monaco-editor) {
     // .overflow-guard .margin, .overflow-guard .margin .margin-view-overlays, .current-line.current-line-margin-both, .line-numbers.active-line-number{
     //   width: fit-content !important;
@@ -104,6 +113,30 @@ const init = () => {
     .view-line {
       text-align: left;
     }
+    // .view-overlays {
+    //   width: 100% !important;
+    //   line-height: 1.5 !important;
+    //   div {
+    //     width: 100% !important;
+    //     height: fit-content !important;
+    //     white-space: wrap;
+    //     word-break: break-all;
+    //   }
+    // }
+    // .lines-content.monaco-editor-background {
+    //   width: 100% !important;
+    // }
+    // .view-lines.monaco-mouse-cursor-text {
+    //   width: 100% !important;
+    //   height: fit-content !important;
+    //   line-height: 1.5 !important;
+    //   div {
+    //     width: 100% !important;
+    //     height: fit-content !important;
+    //     white-space: wrap;
+    //     word-break: break-all;
+    //   }
+    // }
   }
 }
 </style>
