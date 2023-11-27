@@ -34,10 +34,9 @@
 <script setup lang="ts">
 import Editor from '../components/editor.vue'
 import splitMove from '../components/splitMove.vue'
-import { ref, reactive, onMounted, watch, watchEffect, watchSyncEffect, computed, nextTick } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { ref, reactive } from 'vue';
+import { useRouter } from 'vue-router';
 const router = useRouter();
-const route = useRoute();
 
 const backToHome = () => {
   router.push('/');

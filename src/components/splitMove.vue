@@ -24,7 +24,7 @@ onMounted(() => {
 });
 
 // 鼠标单击触发拖拽事件
-const handleMouseDown = (e: any) => {
+const handleMouseDown = () => {
   document.addEventListener('mousemove', handleMousemove);
   document.addEventListener('mouseup', handleMouseup);
 };
@@ -32,27 +32,27 @@ const handleMouseDown = (e: any) => {
 const handleMousemove = (e: any) => {
   // 获取当前组件左右两边dom元素信息
   const { left: pLeft, top: pTop } = splitMove.value.previousElementSibling.getBoundingClientRect()
-  const { left: nLeft, top: nTop } = splitMove.value.nextElementSibling.getBoundingClientRect()
+  const { left: nLeft } = splitMove.value.nextElementSibling.getBoundingClientRect()
   if (props.direction === 'horizontal') {
     // 判断临界值
-    if (e.pageX - pLeft < 300 || splitMove.value.nextElementSibling.offsetWidth - (e.pageX - nLeft) < 300) {
+    if (e.clientX - pLeft < 300 || splitMove.value.nextElementSibling.offsetWidth - (e.clientX - nLeft) < 300) {
       return
     }
     // left不为0时先去掉left值 e.pageX - left
-    splitMove.value.previousElementSibling.style.width = `${e.pageX - pLeft}px`
-    splitMove.value.nextElementSibling.style.width = `${splitMove.value.nextElementSibling.offsetWidth - (e.pageX - nLeft)}px`
+    splitMove.value.previousElementSibling.style.width = `${e.clientX - pLeft}px`
+    splitMove.value.nextElementSibling.style.width = `${splitMove.value.nextElementSibling.offsetWidth - (e.clientX - nLeft)}px`
   } else {
     // 判断临界值
-    if ((e.pageY - pTop) < 160) {
+    if ((e.clientY - pTop) < 160) {
       return
     }
     // top不为0时先去掉top值 e.pageY - top
-    splitMove.value.previousElementSibling.style.height = `${e.pageY - pTop}px`
+    splitMove.value.previousElementSibling.style.height = `${e.clientY - pTop}px`
   }
 };
 
 // 抬起鼠标按键注销事件
-const handleMouseup = (e: any) => {
+const handleMouseup = () => {
   document.removeEventListener('mousemove', handleMousemove);
   document.removeEventListener('mouseup', handleMouseup);
 };

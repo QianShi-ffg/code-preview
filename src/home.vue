@@ -2,8 +2,8 @@
   <div id="home">
     <nav class="nav">Demo</nav>
     <div class="content">
-      <template v-for="(item, i) in routeList" :key="item.name">
-        <div v-if="item.name !== 'home'" class="item" @click="jumpTo(item, i)">
+      <template v-for="(item) in routeList" :key="item.name">
+        <div v-if="item.name !== 'home'" class="item" @click="jumpTo(item)">
           {{ item.name }}
         </div>
       </template>
