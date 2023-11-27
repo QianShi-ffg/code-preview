@@ -8,6 +8,7 @@
 // import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
 import * as monaco from "monaco-editor";
 import { onMounted, reactive, ref, watch, toRaw } from "vue";
+import sass from 'sass.js';
 
 const props = defineProps({
   language: {
@@ -62,9 +63,30 @@ onMounted(() => {
 watch(() => contentChanged.value, (newVal) => {
   if (newVal) {
     const content = toRaw(monacoDiffInstance.value).getValue();
-    emits('update:modelValue', content);
+    if (props.language === 'scss') {
+      sass.compile(content, function(result: any) {
+        if (result.status === 0) {
+          // 编译成功，result.text 包含编译后的 CSS 代码
+          console.log(result)
+          emits('update:modelValue', result.text);
+        } else {
+          // 编译失败，result.message 包含错误信息
+          console.error(result.message);
+        }
+      });
+    } else {
+      emits('update:modelValue', content);
+    }
     // 重置状态
     contentChanged.value = false;
+  }
+})
+
+// 监听当前是否可以更新内容
+watch(() => props.language, (newVal, oldVal) => {
+  console.log(newVal)
+  if (newVal !== oldVal) {
+    monaco.editor.setModelLanguage(toRaw(monacoDiffInstance.value).getModel(), newVal);
   }
 })
 

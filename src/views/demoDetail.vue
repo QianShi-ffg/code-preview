@@ -15,8 +15,12 @@
           </div>
           <splitMove direction="horizontal"></splitMove>
           <div class="editor-item item-css">
-            <div class="editor-item-header" data-title="css"></div>
-            <Editor ref="editorBox" language="css" v-model="content.css" />
+            <div class="editor-item-header" data-title="css">
+              <span>
+                <selectVue :option="cssOption" v-model="cssSelectVal"></selectVue>
+              </span>
+            </div>
+            <Editor ref="editorBox" :language="cssSelectVal" v-model="content.css" />
           </div>
           <splitMove direction="horizontal"></splitMove>
           <div class="editor-item item-js">
@@ -36,6 +40,9 @@ import Editor from '../components/editor.vue'
 import splitMove from '../components/splitMove.vue'
 import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
+import sass from 'sass.js';
+import selectVue from '../components/select.vue';
+
 const router = useRouter();
 
 const backToHome = () => {
@@ -51,7 +58,20 @@ const content = reactive<any>({
   js: ''
 })
 
+const cssSelectVal = ref<string>('')
+const cssOption = [
+  {
+    value: 'css',
+    label: 'css'
+  },
+  {
+    value: 'scss',
+    label: 'scss'
+  },
+]
+
 const init = () => {
+
   preview.value.innerHTML = "<iframe class='iframeDom'></iframe>";
   const iframe = document.querySelector('iframe')
   const iframeDoc = iframe?.contentDocument || iframe?.contentWindow?.document;
@@ -174,12 +194,31 @@ const init = () => {
             padding-left: 50px;
             box-sizing: border-box;
 
-            &::before {
+            span {
               display: inline-block;
               height: 100%;
-              padding: 0 20px;
-              content: attr(data-title);
+              padding: 0 5px;
               background: #f8f8f8;
+              select{
+                background: rgba(0,0,0,0);
+                width: 80px;
+                height: 100%;
+                font-size: 16px;
+                color: #000;
+                text-align: center;
+                border: none;
+                border-radius: 0px;
+                outline: unset;
+              }
+              option{
+                color: black;
+                background: #A6E1EC;
+                line-height: 20px;
+                border-radius: 0;
+              }
+              option:hover{
+                  background: #EBCCD1;
+              }
             }
           }
         }
