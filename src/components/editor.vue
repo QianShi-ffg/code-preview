@@ -34,7 +34,7 @@ const editorBox = ref<any>();
 // 编辑器配置项
 const defaultOpts = reactive<any>({
   language: props.language,
-  value: "", // 编辑器的值
+  value: '', // 编辑器的值
   theme: "vs", // 编辑器主题：vs, hc-black, or vs-dark，更多选择详见官网
   roundedSelection: true, // 右侧不显示编辑器预览框
   autoIndent: true, // 自动缩进
@@ -54,8 +54,9 @@ const defaultOpts = reactive<any>({
   wordWrap: 'bounded', // 开启单词换行
 });
 
-onMounted(() => {
-  init();
+onMounted(async () => {
+  await init();
+  await changeEditorValue();
 });
 
 // 注销组件之前注销编辑器
@@ -137,7 +138,21 @@ const init = () => {
     }
     // markers是返回的错误信息数组，可赋值给需要判断语法错误的关键词，如this.coderErrors = markers
   })
+
+  // 监听失去焦点事件
+  editorBox.value.addEventListener('focusout', (event: any) => {
+    console.dir(event.target);
+    sessionStorage.setItem(`${props.language}Code`, toRaw(monacoDiffInstance.value).getValue())
+  });
 };
+
+const changeEditorValue = () => {
+  console.log(sessionStorage.getItem(`cssCode`))
+  if (sessionStorage.getItem(`${props.language}Code`)) {
+    console.log(props.language, sessionStorage.getItem(`${props.language}Code`))
+    toRaw(monacoDiffInstance.value).setValue(sessionStorage.getItem(`${props.language}Code`));
+  }
+}
 </script>
 
 <style scoped lang="scss">

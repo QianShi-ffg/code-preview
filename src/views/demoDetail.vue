@@ -12,7 +12,7 @@
           <div class="editor-item item-html">
             <div class="editor-item-header" data-title="html">
               <span>
-                <selectVue :option="htmlOption" v-model="htmlSelectVal"></selectVue>
+                <selectVue :option="htmlOption" v-model="htmlSelectVal" type="html"></selectVue>
               </span>
             </div>
             <Editor ref="editorBox" :language="htmlSelectVal" v-model="content.html" v-model:is-error="htmlIsError"/>
@@ -21,7 +21,7 @@
           <div class="editor-item item-css">
             <div class="editor-item-header" data-title="css">
               <span>
-                <selectVue :option="cssOption" v-model="cssSelectVal"></selectVue>
+                <selectVue :option="cssOption" v-model="cssSelectVal" type="css"></selectVue>
               </span>
             </div>
             <Editor ref="editorBox" :language="cssSelectVal" v-model="content.css" v-model:is-error="cssIsError"/>
@@ -30,7 +30,7 @@
           <div class="editor-item item-js">
             <div class="editor-item-header" data-title="javascript">
               <span>
-                <selectVue :option="jsOption" v-model="jsSelectVal"></selectVue>
+                <selectVue :option="jsOption" v-model="jsSelectVal" type="js"></selectVue>
               </span>
             </div>
             <Editor ref="editorBox" :language="jsSelectVal" v-model="content.js" v-model:is-error="jsIsError"/>
