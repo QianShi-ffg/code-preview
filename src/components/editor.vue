@@ -1,14 +1,16 @@
 <template>
-  <div ref="editorBox" class="editorBox" v-show="showEditor"></div>
+  <div ref="editorBox" class="editorBox"></div>
 </template>
 
 <script setup lang="ts">
 // import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
 // import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
 // import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
-import * as monaco from "monaco-editor";
+// import * as monaco from "monaco-editor";
 import { onMounted, reactive, ref, watch, toRaw, onUnmounted, nextTick } from "vue";
 import sass from 'sass.js';
+
+declare function require(moduleNames: string[], onLoad: (...args: any[]) => void): void;
 
 const props = defineProps({
   language: {
@@ -30,7 +32,7 @@ const emits = defineEmits(['update:modelValue', 'update:isError']);
 const monacoDiffInstance = ref<any>(null);
 const contentChanged = ref<boolean>(false);
 const editorBox = ref<any>();
-const showEditor = ref<boolean>(false);
+const monacoRef = ref<any>();
 
 // 编辑器配置项
 const defaultOpts = reactive<any>({
@@ -42,7 +44,7 @@ const defaultOpts = reactive<any>({
   automaticLayout: true,
   contextmenu: false, // 右键菜单
   acceptSuggestionOnEnter: "on",
-  lineNumbers: 'on', 
+  lineNumbers: 'on',
   lineNumbersMinChars: 4,
   foldingStrategy: "indentation", // 代码可分小段折叠
   folding: true, // 是否启用代码折叠
@@ -56,9 +58,8 @@ const defaultOpts = reactive<any>({
 });
 
 onMounted(() => {
-  nextTick(async() => {
-    await init();
-    await changeEditorValue();
+  nextTick(() => {
+    init();
   })
 });
 
@@ -72,7 +73,7 @@ watch(() => contentChanged.value, (newVal) => {
   if (newVal) {
     const content = toRaw(monacoDiffInstance.value)?.getValue();
     if (props.language === 'scss') {
-      sass.compile(content, function(result: any) {
+      sass.compile(content, function (result: any) {
         if (result.status === 0) {
           // 编译成功，result.text 包含编译后的 CSS 代码
           console.log(result)
@@ -93,7 +94,7 @@ watch(() => contentChanged.value, (newVal) => {
 // 监听当前是否可以进行语言变更
 watch(() => props.language, (newVal, oldVal) => {
   if (monacoDiffInstance.value && newVal !== oldVal) {
-    monaco.editor?.setModelLanguage(toRaw(monacoDiffInstance.value)?.getModel(), newVal);
+    monacoRef.value?.editor?.setModelLanguage(toRaw(monacoDiffInstance.value)?.getModel(), newVal);
   }
 })
 
@@ -101,53 +102,68 @@ watch(() => props.language, (newVal, oldVal) => {
  * 初始化
  */
 const init = () => {
-  monacoDiffInstance.value = monaco.editor.create(editorBox.value, defaultOpts);
-  monaco.editor.defineTheme("myTheme", {
-    base: "vs",
-    inherit: true,
-    rules: [],
-    colors: {
-      "editor.foreground": "#000000",
-      "editor.background": "#f8f8f8",
-      "editorCursor.foreground": "#8B0000",
-      "editor.lineHighlightBackground": "#0000FF20",
-      "editorLineNumber.foreground": "#008800",
-      "editor.selectionBackground": "#88000030",
-      "editor.inactiveSelectionBackground": "#88000015",
-    },
-  });
-  // 设置主题
-  monaco.editor.setTheme("myTheme");
+  // 在 Monaco Editor 脚本加载后初始化编辑器
+  // import('monaco-editor').then(monaco => {
+  //   // 在 Monaco Editor 脚本加载后初始化编辑器
+  //   require(['vs/editor/editor.main'], () => {
+  //     const editor = monaco.editor.create(editorRef.value, {
+  //       value: 'console.log("Hello, Monaco Editor!")',
+  //       language: 'javascript',
+  //     });
 
-  // 显示编辑器
-  showEditor.value = true;
+  //     // 可以在此处添加其他配置和事件监听
+  //   });
+  // });
 
-  // 实时获取内容变更
-  monacoDiffInstance.value.onDidChangeModelContent((e: any) => {
-    console.log(e)
-    contentChanged.value = true;
-  });
-  
-  // 实时获取编辑器错误信息
-  monaco.editor.onDidChangeMarkers(() => {
-    const markers = monaco.editor.getModelMarkers({resource: toRaw(monacoDiffInstance.value).getModel().uri})
-    const newMarkers = markers.filter((item: any) => {
-      return item.code !== 'emptyRules'
+  require(['vs/editor/editor.main'], (monaco: any) => {
+    monacoRef.value = monaco;
+    monacoDiffInstance.value = monaco.editor.create(editorBox.value, defaultOpts);
+    monaco.editor.defineTheme("myTheme", {
+      base: "vs",
+      inherit: true,
+      rules: [],
+      colors: {
+        "editor.foreground": "#000000",
+        "editor.background": "#f8f8f8",
+        "editorCursor.foreground": "#8B0000",
+        "editor.lineHighlightBackground": "#0000FF20",
+        "editorLineNumber.foreground": "#008800",
+        "editor.selectionBackground": "#88000030",
+        "editor.inactiveSelectionBackground": "#88000015",
+      },
+    });
+    // 设置主题
+    monaco.editor.setTheme("myTheme");
+
+    // 实时获取内容变更
+    monacoDiffInstance.value.onDidChangeModelContent((e: any) => {
+      console.log(e)
+      contentChanged.value = true;
+    });
+
+    // 实时获取编辑器错误信息
+    monaco.editor.onDidChangeMarkers(() => {
+      const markers = monaco.editor.getModelMarkers({ resource: toRaw(monacoDiffInstance.value).getModel().uri })
+      const newMarkers = markers.filter((item: any) => {
+        return item.code !== 'emptyRules'
+      })
+      console.log(newMarkers)
+      if (newMarkers.length > 0) {
+        console.log(newMarkers, props.language, 'newMarkersnewMarkersnewMarkersnewMarkersnewMarkersnewMarkers')
+        emits('update:isError', true);
+      } else {
+        emits('update:isError', false);
+      }
+      // markers是返回的错误信息数组，可赋值给需要判断语法错误的关键词，如this.coderErrors = markers
     })
-    console.log(newMarkers)
-    if (newMarkers.length > 0) {
-      console.log(newMarkers, props.language,'newMarkersnewMarkersnewMarkersnewMarkersnewMarkersnewMarkers')
-      emits('update:isError', true);
-    } else {
-      emits('update:isError', false);
-    }
-    // markers是返回的错误信息数组，可赋值给需要判断语法错误的关键词，如this.coderErrors = markers
-  })
 
-  // 监听失去焦点事件
-  editorBox.value.addEventListener('focusout', (event: any) => {
-    console.dir(event.target);
-    sessionStorage.setItem(`${props.language}Code`, toRaw(monacoDiffInstance.value)?.getValue())
+    // 监听失去焦点事件
+    editorBox.value.addEventListener('focusout', (event: any) => {
+      console.dir(event.target);
+      sessionStorage.setItem(`${props.language}Code`, toRaw(monacoDiffInstance.value)?.getValue())
+    });
+    monaco.editor?.setModelLanguage(toRaw(monacoDiffInstance.value)?.getModel(), props.language);
+    changeEditorValue();
   });
 };
 
@@ -164,7 +180,9 @@ const changeEditorValue = () => {
 .editorBox {
   width: 100%;
   height: calc(100% - 24px);
+
   :deep(.monaco-editor) {
+
     // .overflow-guard .margin, .overflow-guard .margin .margin-view-overlays, .current-line.current-line-margin-both, .line-numbers.active-line-number{
     //   width: fit-content !important;
     //   min-width: 30px;
@@ -173,6 +191,7 @@ const changeEditorValue = () => {
     .view-line {
       text-align: left;
     }
+
     // .view-overlays {
     //   width: 100% !important;
     //   line-height: 1.5 !important;

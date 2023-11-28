@@ -8,6 +8,16 @@
   </head>
   <body>
     <div id="app"></div>
+    <!-- <script src="./monaco/loader.js"></script>
+    <script>
+      // 在这里加载 Monaco Editor 所需的脚本
+      require.config({ paths: { 'vs': './monaco/' }});
+    </script> -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/monaco-editor/0.43.0/min/vs/loader.js"></script>
+    <script>
+      // 在这里加载 Monaco Editor 所需的脚本
+      require.config({ paths: { 'vs': 'https://cdn.bootcdn.net/ajax/libs/monaco-editor/0.43.0/min/vs' }});
+    </script>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
