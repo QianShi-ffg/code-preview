@@ -64,6 +64,7 @@ const jumpTo = (value: any) => {
     font-weight: 700;
     font-family: math;
     cursor: pointer;
+    user-select: none;
     &::before {
       position: absolute;
       top: -22px;
