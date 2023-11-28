@@ -7,7 +7,7 @@
 // import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
 // import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
 import * as monaco from "monaco-editor";
-import { onMounted, reactive, ref, watch, toRaw } from "vue";
+import { onMounted, reactive, ref, watch, toRaw, onUnmounted } from "vue";
 import sass from 'sass.js';
 
 const props = defineProps({
@@ -19,9 +19,13 @@ const props = defineProps({
     type: [String, Number],
     default: '',
   },
+  isError: {
+    type: Boolean,
+    default: false,
+  }
 });
 
-const emits = defineEmits(['update:modelValue']);
+const emits = defineEmits(['update:modelValue', 'update:isError']);
 
 const monacoDiffInstance = ref<any>(null);
 const contentChanged = ref<boolean>(false);
@@ -55,9 +59,9 @@ onMounted(() => {
 });
 
 // 注销组件之前注销编辑器
-// onUnmounted(() => {
-//   monacoDiffInstance.value.dispose();
-// });
+onUnmounted(() => {
+  toRaw(monacoDiffInstance.value).dispose();
+});
 
 // 监听当前是否可以更新内容
 watch(() => contentChanged.value, (newVal) => {
@@ -82,7 +86,7 @@ watch(() => contentChanged.value, (newVal) => {
   }
 })
 
-// 监听当前是否可以更新内容
+// 监听当前是否可以进行语言变更
 watch(() => props.language, (newVal, oldVal) => {
   console.log(newVal)
   if (newVal !== oldVal) {
@@ -109,18 +113,31 @@ const init = () => {
       "editor.inactiveSelectionBackground": "#88000015",
     },
   });
+  // 设置主题
   monaco.editor.setTheme("myTheme");
+
+  // 实时获取内容变更
   monacoDiffInstance.value.onDidChangeModelContent((e: any) => {
     console.log(e)
     contentChanged.value = true;
   });
+  
+  // 实时获取编辑器错误信息
+  monaco.editor.onDidChangeMarkers(() => {
+    const markers = monaco.editor.getModelMarkers({resource: toRaw(monacoDiffInstance.value).getModel().uri})
+    const newMarkers = markers.filter((item: any) => {
+      return item.code !== 'emptyRules'
+    })
+    console.log(newMarkers)
+    if (newMarkers.length > 0) {
+      console.log(newMarkers, props.language,'newMarkersnewMarkersnewMarkersnewMarkersnewMarkersnewMarkers')
+      emits('update:isError', true);
+    } else {
+      emits('update:isError', false);
+    }
+    // markers是返回的错误信息数组，可赋值给需要判断语法错误的关键词，如this.coderErrors = markers
+  })
 };
-
-// const mResize = () => {
-//   setTimeout(() => {
-//     monacoDiffInstance.value?.layout()
-//   }, 500); // 在 200 毫秒后执行 layout
-// }
 </script>
 
 <style scoped lang="scss">

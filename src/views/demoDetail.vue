@@ -10,8 +10,12 @@
       <div class="main-right">
         <div class="editor" ref="editorList">
           <div class="editor-item item-html">
-            <div class="editor-item-header" data-title="html"></div>
-            <Editor ref="editorBox" language="html" v-model="content.html" />
+            <div class="editor-item-header" data-title="html">
+              <span>
+                <selectVue :option="htmlOption" v-model="htmlSelectVal"></selectVue>
+              </span>
+            </div>
+            <Editor ref="editorBox" :language="htmlSelectVal" v-model="content.html" v-model:is-error="htmlIsError"/>
           </div>
           <splitMove direction="horizontal"></splitMove>
           <div class="editor-item item-css">
@@ -20,12 +24,16 @@
                 <selectVue :option="cssOption" v-model="cssSelectVal"></selectVue>
               </span>
             </div>
-            <Editor ref="editorBox" :language="cssSelectVal" v-model="content.css" />
+            <Editor ref="editorBox" :language="cssSelectVal" v-model="content.css" v-model:is-error="cssIsError"/>
           </div>
           <splitMove direction="horizontal"></splitMove>
           <div class="editor-item item-js">
-            <div class="editor-item-header" data-title="javascript"></div>
-            <Editor ref="editorBox" language="javascript" v-model="content.js" />
+            <div class="editor-item-header" data-title="javascript">
+              <span>
+                <selectVue :option="jsOption" v-model="jsSelectVal"></selectVue>
+              </span>
+            </div>
+            <Editor ref="editorBox" :language="jsSelectVal" v-model="content.js" v-model:is-error="jsIsError"/>
           </div>
         </div>
         <splitMove direction="vertical"></splitMove>
@@ -40,7 +48,6 @@ import Editor from '../components/editor.vue'
 import splitMove from '../components/splitMove.vue'
 import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
-import sass from 'sass.js';
 import selectVue from '../components/select.vue';
 
 const router = useRouter();
@@ -58,7 +65,15 @@ const content = reactive<any>({
   js: ''
 })
 
+const htmlSelectVal = ref<string>('html')
 const cssSelectVal = ref<string>('')
+const jsSelectVal = ref<string>('javascript')
+const htmlOption = [
+  {
+    value: 'html',
+    label: 'html'
+  },
+]
 const cssOption = [
   {
     value: 'css',
@@ -69,17 +84,38 @@ const cssOption = [
     label: 'scss'
   },
 ]
+const jsOption = [
+  {
+    value: 'javascript',
+    label: 'javascript'
+  },
+]
+
+const cssIsError = ref<boolean>(false);
+const htmlIsError = ref<boolean>(false);
+const jsIsError = ref<boolean>(false);
 
 const init = () => {
-
-  preview.value.innerHTML = "<iframe class='iframeDom'></iframe>";
-  const iframe = document.querySelector('iframe')
-  const iframeDoc = iframe?.contentDocument || iframe?.contentWindow?.document;
-  iframeDoc?.open();
-  // 构建内容
-  let iframeContent = `${content.html}<style>${content.css}</style><script>${content.js}<\/script>`;
-  iframeDoc?.write(iframeContent);
-  iframeDoc?.close();
+  if (!cssIsError.value && !jsIsError.value && !htmlIsError.value) {
+    preview.value.innerHTML = "<iframe class='iframeDom'></iframe>";
+    const iframe = document.querySelector('iframe')
+    const iframeDoc = iframe?.contentDocument || iframe?.contentWindow?.document;
+    iframeDoc?.open();
+    // 构建内容
+    let iframeContent = `${content.html}<style>${content.css}</style><script>${content.js}<\/script>`;
+    iframeDoc?.write(iframeContent);
+    iframeDoc?.close();
+  } else {
+    if (htmlIsError.value) {
+      alert(`${htmlSelectVal.value}语法错误`);
+    }
+    if (cssIsError.value) {
+      alert(`${cssSelectVal.value}语法错误`);
+    }
+    if (jsIsError.value) {
+      alert(`${jsSelectVal.value}语法错误`);
+    }
+  }
 }
 
 
@@ -201,7 +237,8 @@ const init = () => {
               background: #f8f8f8;
               select{
                 background: rgba(0,0,0,0);
-                width: 80px;
+                width: fit-content;
+                min-width: 80px;
                 height: 100%;
                 font-size: 16px;
                 color: #000;
