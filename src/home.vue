@@ -33,11 +33,15 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
+import loadingHook from './hooks/loadingHook';
 
 const router = useRouter();
 const routeList = ref<any>([]);
 
 onMounted(() => {
+  setTimeout(() => {
+    loadingHook.value = false
+  }, 4000)
   routeList.value = router.options.routes[1].children;
   console.log(router.options.routes, 52222);
 });

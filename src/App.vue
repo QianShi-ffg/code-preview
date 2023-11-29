@@ -1,8 +1,13 @@
 <script setup lang="ts">
+import loadingVue from './components/loading.vue';
+import loadingHook from './hooks/loadingHook';
+
+loadingHook.value = true
 </script>
 
 <template>
   <router-view />
+  <loadingVue />
 </template>
 
 <style scoped lang="scss">

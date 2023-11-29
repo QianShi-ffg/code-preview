@@ -103,18 +103,6 @@ watch(() => props.language, (newVal, oldVal) => {
  */
 const init = () => {
   // 在 Monaco Editor 脚本加载后初始化编辑器
-  // import('monaco-editor').then(monaco => {
-  //   // 在 Monaco Editor 脚本加载后初始化编辑器
-  //   require(['vs/editor/editor.main'], () => {
-  //     const editor = monaco.editor.create(editorRef.value, {
-  //       value: 'console.log("Hello, Monaco Editor!")',
-  //       language: 'javascript',
-  //     });
-
-  //     // 可以在此处添加其他配置和事件监听
-  //   });
-  // });
-
   require(['vs/editor/editor.main'], (monaco: any) => {
     monacoRef.value = monaco;
     monacoDiffInstance.value = monaco.editor.create(editorBox.value, defaultOpts);

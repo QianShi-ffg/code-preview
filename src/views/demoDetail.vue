@@ -46,9 +46,10 @@
 <script setup lang="ts">
 import Editor from '../components/editor.vue'
 import splitMove from '../components/splitMove.vue'
-import { ref, reactive } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import selectVue from '../components/select.vue';
+import loadingHook from '../hooks/loadingHook';
 
 const router = useRouter();
 
@@ -94,6 +95,13 @@ const jsOption = [
 const cssIsError = ref<boolean>(false);
 const htmlIsError = ref<boolean>(false);
 const jsIsError = ref<boolean>(false);
+
+loadingHook.value = true
+onMounted(() => {
+  setTimeout(() => {
+    loadingHook.value = false
+  }, 4000)
+})
 
 const init = () => {
   if (!cssIsError.value && !jsIsError.value && !htmlIsError.value) {
