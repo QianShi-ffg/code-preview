@@ -15,7 +15,7 @@
                 <selectVue :option="htmlOption" v-model="htmlSelectVal" type="html"></selectVue>
               </span>
             </div>
-            <Editor ref="editorBox" :language="htmlSelectVal" v-model="content.html" v-model:is-error="htmlIsError"/>
+            <Editor :language="htmlSelectVal" v-model="content.html" v-model:is-error="htmlIsError"/>
           </div>
           <splitMove direction="horizontal"></splitMove>
           <div class="editor-item item-css">
@@ -24,7 +24,7 @@
                 <selectVue :option="cssOption" v-model="cssSelectVal" type="css"></selectVue>
               </span>
             </div>
-            <Editor ref="editorBox" :language="cssSelectVal" v-model="content.css" v-model:is-error="cssIsError"/>
+            <Editor :language="cssSelectVal" v-model="content.css" v-model:is-error="cssIsError"/>
           </div>
           <splitMove direction="horizontal"></splitMove>
           <div class="editor-item item-js">
@@ -33,7 +33,7 @@
                 <selectVue :option="jsOption" v-model="jsSelectVal" type="js"></selectVue>
               </span>
             </div>
-            <Editor ref="editorBox" :language="jsSelectVal" v-model="content.js" v-model:is-error="jsIsError"/>
+            <Editor :language="jsSelectVal" v-model="content.js" v-model:is-error="jsIsError"/>
           </div>
         </div>
         <splitMove direction="vertical"></splitMove>
@@ -104,6 +104,7 @@ onMounted(() => {
 })
 
 const init = () => {
+  console.log(cssIsError.value, jsIsError.value, htmlIsError.value, content.css)
   if (!cssIsError.value && !jsIsError.value && !htmlIsError.value) {
     preview.value.innerHTML = "<iframe class='iframeDom'></iframe>";
     const iframe = document.querySelector('iframe')

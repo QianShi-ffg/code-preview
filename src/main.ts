@@ -28,6 +28,7 @@ self.MonacoEnvironment = {
 };
 // 注册icon
 const app: any = createApp(App);
+
 // for (const [key, component] of Object.entries(kitsIcon)) {
 //   app.component(key, component);
 // }

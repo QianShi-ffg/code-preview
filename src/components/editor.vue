@@ -8,7 +8,7 @@
 // import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
 // import * as monaco from "monaco-editor";
 import { onMounted, reactive, ref, watch, toRaw, onUnmounted, nextTick } from "vue";
-import sass from 'sass.js';
+// import sass from 'sass.js';
 
 declare function require(moduleNames: string[], onLoad: (...args: any[]) => void): void;
 
@@ -28,7 +28,6 @@ const props = defineProps({
 });
 
 const emits = defineEmits(['update:modelValue', 'update:isError']);
-
 const monacoDiffInstance = ref<any>(null);
 const contentChanged = ref<boolean>(false);
 const editorBox = ref<any>();
@@ -71,23 +70,24 @@ onUnmounted(() => {
 // 监听当前是否可以更新内容
 watch(() => contentChanged.value, (newVal) => {
   if (newVal) {
-    const content = toRaw(monacoDiffInstance.value)?.getValue();
-    if (props.language === 'scss') {
-      sass.compile(content, function (result: any) {
-        if (result.status === 0) {
-          // 编译成功，result.text 包含编译后的 CSS 代码
-          console.log(result)
-          emits('update:modelValue', result.text);
-        } else {
-          // 编译失败，result.message 包含错误信息
-          console.error(result.message);
-        }
-      });
-    } else {
-      emits('update:modelValue', content);
-    }
+    // const content = toRaw(monacoDiffInstance.value)?.getValue();
+    // console.log(123)
+    // if (props.language === 'scss') {
+    //   sass.compile(content, function (result: any) {
+    //     if (result.status === 0) {
+    //       // 编译成功，result.text 包含编译后的 CSS 代码
+    //       console.log(result, result.text, 'result.textresult.textresult.textresult.textresult.textresult.text')
+    //       emits('update:modelValue', result.text);
+    //     } else {
+    //       // 编译失败，result.message 包含错误信息
+    //       console.error(result.message);
+    //     }
+    //   });
+    // } else {
+    //   emits('update:modelValue', content);
+    // }
     // 重置状态
-    contentChanged.value = false;
+    // contentChanged.value = false;
   }
 })
 
@@ -125,17 +125,32 @@ const init = () => {
 
     // 实时获取内容变更
     monacoDiffInstance.value.onDidChangeModelContent((e: any) => {
-      console.log(e)
       contentChanged.value = true;
+      console.log(e)
+      const content = toRaw(monacoDiffInstance.value)?.getValue();
+    console.log(123)
+    if (props.language === 'scss') {
+      Sass.compile(content, function (result: any) {
+        if (result.status === 0) {
+          // 编译成功，result.text 包含编译后的 CSS 代码
+          console.log(result, result.text, 'result.textresult.textresult.textresult.textresult.textresult.text')
+          emits('update:modelValue', result.text);
+        } else {
+          // 编译失败，result.message 包含错误信息
+          console.error(result.message);
+        }
+      });
+    } else {
+      emits('update:modelValue', content);
+    }
     });
 
     // 实时获取编辑器错误信息
     monaco.editor.onDidChangeMarkers(() => {
-      const markers = monaco.editor.getModelMarkers({ resource: toRaw(monacoDiffInstance.value).getModel().uri })
+      const markers = monaco.editor.getModelMarkers({ resource: toRaw(monacoDiffInstance.value).getModel()?.uri })
       const newMarkers = markers.filter((item: any) => {
-        return item.code !== 'emptyRules'
+        return item.code !== 'emptyRules' && item.code !== '6133' && item.code !== "unknownProperties"
       })
-      console.log(newMarkers)
       if (newMarkers.length > 0) {
         console.log(newMarkers, props.language, 'newMarkersnewMarkersnewMarkersnewMarkersnewMarkersnewMarkers')
         emits('update:isError', true);
