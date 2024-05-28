@@ -195,7 +195,7 @@ const switchCss = (value: string) => {
       return { css: result.css, error: null };
     } catch (error: any) {
       console.log("Sass compilation error:", error);
-      alert(`${cssSelectVal.value}语法错误`);
+      alert(`${cssSelectVal.value}有语法错误`);
       return { css: "", error: error?.message };
     }
   } else if (cssSelectVal.value === "css") {
