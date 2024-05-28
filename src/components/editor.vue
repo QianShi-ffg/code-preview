@@ -98,6 +98,10 @@ watch(() => props.language, (newVal, oldVal) => {
   }
 })
 
+// // 监听当前是否可以进行语言变更
+// watch(() => props.modelValue, (newVal, oldVal) => {
+// })
+
 /**
  * 初始化
  */
@@ -123,26 +127,33 @@ const init = () => {
     // 设置主题
     monaco.editor.setTheme("myTheme");
 
+    // 将接口查询的值放到编辑器中
+    if (props.modelValue) {
+      toRaw(monacoDiffInstance.value)?.setValue(props.modelValue);
+    }
+
     // 实时获取内容变更
     monacoDiffInstance.value.onDidChangeModelContent((e: any) => {
       contentChanged.value = true;
       console.log(e)
       const content = toRaw(monacoDiffInstance.value)?.getValue();
-    console.log(123)
-    if (props.language === 'scss') {
-      Sass.compile(content, function (result: any) {
-        if (result.status === 0) {
-          // 编译成功，result.text 包含编译后的 CSS 代码
-          console.log(result, result.text, 'result.textresult.textresult.textresult.textresult.textresult.text')
-          emits('update:modelValue', result.text);
-        } else {
-          // 编译失败，result.message 包含错误信息
-          console.error(result.message);
-        }
-      });
-    } else {
+      // if (props.language === 'scss') {
+      //   console.log('scssscssscssscssscssscssscssscssscssscssscssscssscssscssscssscssscssscssscssscssscssscssscss')
+      //   Sass.compile(content, function (result: any) {
+      //     console.log(1212)
+      //     if (result.status === 0) {
+      //       // 编译成功，result.text 包含编译后的 CSS 代码
+      //       console.log(result, result.text, 'result.textresult.textresult.textresult.textresult.textresult.text')
+      //       emits('update:modelValue', result.text);
+      //     } else {
+      //       // 编译失败，result.message 包含错误信息
+      //       console.error(result.message);
+      //     }
+      //   });
+      // } else {
+      //   emits('update:modelValue', content);
+      // }
       emits('update:modelValue', content);
-    }
     });
 
     // 实时获取编辑器错误信息
@@ -166,17 +177,17 @@ const init = () => {
       sessionStorage.setItem(`${props.language}Code`, toRaw(monacoDiffInstance.value)?.getValue())
     });
     monaco.editor?.setModelLanguage(toRaw(monacoDiffInstance.value)?.getModel(), props.language);
-    changeEditorValue();
+    // changeEditorValue();
   });
 };
 
-const changeEditorValue = () => {
-  console.log(sessionStorage.getItem(`cssCode`))
-  if (sessionStorage.getItem(`${props.language}Code`)) {
-    console.log(props.language, sessionStorage.getItem(`${props.language}Code`))
-    toRaw(monacoDiffInstance.value)?.setValue(sessionStorage.getItem(`${props.language}Code`));
-  }
-}
+// const changeEditorValue = () => {
+//   console.log(sessionStorage.getItem(`cssCode`))
+//   if (sessionStorage.getItem(`${props.language}Code`)) {
+//     console.log(props.language, sessionStorage.getItem(`${props.language}Code`))
+//     toRaw(monacoDiffInstance.value)?.setValue(sessionStorage.getItem(`${props.language}Code`));
+//   }
+// }
 </script>
 
 <style scoped lang="scss">

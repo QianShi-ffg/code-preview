@@ -21,8 +21,8 @@
       </svg>  
     </nav>
     <div class="content">
-      <template v-for="item in routeList" :key="item.name">
-        <div v-if="item.name !== 'home'" class="item" @click="jumpTo(item)">
+      <template v-for="item in demoList" :key="item.name">
+        <div class="item" @click="jumpTo(item)">
           {{ item.name }}
         </div>
       </template>
@@ -34,21 +34,31 @@
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import loadingHook from './hooks/loadingHook';
+import { getDemoList } from '@/api/api';
 
 const router = useRouter();
-const routeList = ref<any>([]);
+const demoList = ref<any>([]);
 
 onMounted(() => {
   setTimeout(() => {
     loadingHook.value = false
   }, 4000)
-  routeList.value = router.options.routes[1].children;
-  console.log(router.options.routes, 52222);
 });
 
 const jumpTo = (value: any) => {
-  router.push({ path: `/demoDetail/${value.name}` });
+  router.push({ path: `/demoDetail`, query: { id: value.id } });
 };
+
+onMounted(() => {
+  init()
+})
+
+const init = async() => {
+  const res: any = await getDemoList({});
+  if (res.code === 200) {
+    demoList.value = res.data
+  }
+}
 </script>
 
 <style scoped lang="scss">

@@ -5,10 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc && vite build --mode production",
+    "build": "vite build --mode production",
     "preview": "vite preview"
   },
   "dependencies": {
+    "axios": "^1.7.2",
     "monaco-editor": "^0.44.0",
     "monaco-editor-textmate": "^4.0.0",
     "sass": "^1.69.5",

@@ -12,28 +12,52 @@
           <div class="editor-item item-html">
             <div class="editor-item-header" data-title="html">
               <span>
-                <selectVue :option="htmlOption" v-model="htmlSelectVal" type="html"></selectVue>
+                <selectVue
+                  :option="htmlOption"
+                  v-model="htmlSelectVal"
+                  type="html"
+                ></selectVue>
               </span>
             </div>
-            <Editor :language="htmlSelectVal" v-model="content.html" v-model:is-error="htmlIsError"/>
+            <Editor
+              :language="htmlSelectVal"
+              v-model="content.html"
+              v-model:is-error="htmlIsError"
+            />
           </div>
           <splitMove direction="horizontal"></splitMove>
           <div class="editor-item item-css">
             <div class="editor-item-header" data-title="css">
               <span>
-                <selectVue :option="cssOption" v-model="cssSelectVal" type="css"></selectVue>
+                <selectVue
+                  :option="cssOption"
+                  v-model="cssSelectVal"
+                  type="css"
+                ></selectVue>
               </span>
             </div>
-            <Editor :language="cssSelectVal" v-model="content.css" v-model:is-error="cssIsError"/>
+            <Editor
+              :language="cssSelectVal"
+              v-model="content.css"
+              v-model:is-error="cssIsError"
+            />
           </div>
           <splitMove direction="horizontal"></splitMove>
           <div class="editor-item item-js">
             <div class="editor-item-header" data-title="javascript">
               <span>
-                <selectVue :option="jsOption" v-model="jsSelectVal" type="js"></selectVue>
+                <selectVue
+                  :option="jsOption"
+                  v-model="jsSelectVal"
+                  type="js"
+                ></selectVue>
               </span>
             </div>
-            <Editor :language="jsSelectVal" v-model="content.js" v-model:is-error="jsIsError"/>
+            <Editor
+              :language="jsSelectVal"
+              v-model="content.js"
+              v-model:is-error="jsIsError"
+            />
           </div>
         </div>
         <splitMove direction="vertical"></splitMove>
@@ -44,74 +68,99 @@
 </template>
 
 <script setup lang="ts">
-import Editor from '../components/editor.vue'
-import splitMove from '../components/splitMove.vue'
-import { ref, reactive, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import selectVue from '../components/select.vue';
-import loadingHook from '../hooks/loadingHook';
+import Editor from "../components/editor.vue";
+import splitMove from "../components/splitMove.vue";
+import { ref, reactive, onMounted } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import selectVue from "../components/select.vue";
+import loadingHook from "../hooks/loadingHook";
+import { getDemoItem } from "@/api/api";
+import * as sass from "sass";
 
 const router = useRouter();
+const route = useRoute();
 
 const backToHome = () => {
-  router.push('/');
+  router.push("/");
 };
 
 const editorList = ref<Element | Node | undefined>();
 
 const preview = ref<any>();
 const content = reactive<any>({
-  html: '',
-  css: '',
-  js: ''
-})
+  html: "",
+  css: "",
+  js: "",
+});
 
-const htmlSelectVal = ref<string>('html')
-const cssSelectVal = ref<string>('')
-const jsSelectVal = ref<string>('javascript')
+const htmlSelectVal = ref<string>("html");
+const cssSelectVal = ref<string>("css");
+const jsSelectVal = ref<string>("javascript");
 const htmlOption = [
   {
-    value: 'html',
-    label: 'html'
+    value: "html",
+    label: "html",
   },
-]
+];
 const cssOption = [
   {
-    value: 'css',
-    label: 'css'
+    value: "css",
+    label: "css",
   },
   {
-    value: 'scss',
-    label: 'scss'
+    value: "scss",
+    label: "scss",
   },
-]
+];
 const jsOption = [
   {
-    value: 'javascript',
-    label: 'javascript'
+    value: "javascript",
+    label: "javascript",
   },
-]
+];
 
 const cssIsError = ref<boolean>(false);
 const htmlIsError = ref<boolean>(false);
 const jsIsError = ref<boolean>(false);
 
-loadingHook.value = true
+loadingHook.value = true;
 onMounted(() => {
   setTimeout(() => {
-    loadingHook.value = false
-  }, 4000)
-})
+    loadingHook.value = false;
+  }, 4000);
+});
 
-const init = () => {
-  console.log(cssIsError.value, jsIsError.value, htmlIsError.value, content.css)
+const initDemo = async () => {
+  const res: any = await getDemoItem({ id: route.query.id });
+  if (res.code === 200) {
+    console.log(res.data);
+    content.html = res.data.html;
+    content.css = res.data.css;
+    content.js = res.data.javascript;
+    htmlSelectVal.value = res.data.htmlLanguage || "html";
+    cssSelectVal.value = res.data.cssLanguage || "css";
+    jsSelectVal.value = res.data.jsLanguage || "javascript";
+    // init()
+  }
+};
+initDemo();
+
+const init = async() => {
+  console.log(
+    cssIsError.value,
+    jsIsError.value,
+    htmlIsError.value,
+    content.css
+  );
+  const newCssVal = (await switchCss(content.css) as any)?.css
   if (!cssIsError.value && !jsIsError.value && !htmlIsError.value) {
     preview.value.innerHTML = "<iframe class='iframeDom'></iframe>";
-    const iframe = document.querySelector('iframe')
-    const iframeDoc = iframe?.contentDocument || iframe?.contentWindow?.document;
+    const iframe = document.querySelector("iframe");
+    const iframeDoc =
+      iframe?.contentDocument || iframe?.contentWindow?.document;
     iframeDoc?.open();
     // 构建内容
-    let iframeContent = `${content.html}<style>${content.css}</style><script>${content.js}<\/script>`;
+    let iframeContent = `${content.html}<style>${newCssVal}</style><script>${content.js}<\/script>`;
     iframeDoc?.write(iframeContent);
     iframeDoc?.close();
   } else {
@@ -125,9 +174,34 @@ const init = () => {
       alert(`${jsSelectVal.value}语法错误`);
     }
   }
-}
+};
 
-
+const switchCss = (value: string) => {
+  if (cssSelectVal.value === "scss") {
+    //   console.log('scssscssscssscssscssscssscssscssscssscssscssscssscssscssscssscssscssscssscssscssscssscssscss')
+    //   Sass.compile(content, function (result: any) {
+    //     console.log(1212)
+    //     if (result.status === 0) {
+    //       // 编译成功，result.text 包含编译后的 CSS 代码
+    //       console.log(result, result.text, 'result.textresult.textresult.textresult.textresult.textresult.text')
+    //       return result.text;
+    //     } else {
+    //       // 编译失败，result.message 包含错误信息
+    //       console.error(result.message);
+    //     }
+    //   });
+    try {
+      const result = sass.compileString(value);
+      return { css: result.css, error: null };
+    } catch (error: any) {
+      console.log("Sass compilation error:", error);
+      alert(`${cssSelectVal.value}语法错误`);
+      return { css: "", error: error?.message };
+    }
+  } else if (cssSelectVal.value === "css") {
+    return value;
+  }
+};
 </script>
 
 <style scoped lang="scss">
@@ -195,7 +269,8 @@ const init = () => {
       color: #a174e7;
 
       &:hover {
-        box-shadow: 0 0 5px 0 inset #c9c9ea, 0 0 10px 5px inset #a174e7, 0 0 3px 0px #a174e7;
+        box-shadow: 0 0 5px 0 inset #c9c9ea, 0 0 10px 5px inset #a174e7,
+          0 0 3px 0px #a174e7;
         // background: radial-gradient(#c9c9ea, #a174e7);
       }
 
@@ -244,8 +319,9 @@ const init = () => {
               height: 100%;
               padding: 0 5px;
               background: #f8f8f8;
-              select{
-                background: rgba(0,0,0,0);
+
+              select {
+                background: rgba(0, 0, 0, 0);
                 width: fit-content;
                 min-width: 80px;
                 height: 100%;
@@ -256,14 +332,16 @@ const init = () => {
                 border-radius: 0px;
                 outline: unset;
               }
-              option{
+
+              option {
                 color: black;
-                background: #A6E1EC;
+                background: #a6e1ec;
                 line-height: 20px;
                 border-radius: 0;
               }
-              option:hover{
-                  background: #EBCCD1;
+
+              option:hover {
+                background: #ebccd1;
               }
             }
           }
@@ -277,4 +355,5 @@ const init = () => {
       }
     }
   }
-}</style>
+}
+</style>
