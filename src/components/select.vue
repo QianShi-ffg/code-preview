@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, PropType, ref } from "vue";
+import { onMounted, PropType, ref, watch } from "vue";
 
 const props = defineProps({
   option: {
@@ -29,20 +29,25 @@ const emit = defineEmits(["update:modelValue"]);
 const select = ref<any>();
 const selectVal = ref<any>('');
 
+watch(()=> props.modelValue, (newVal: any) => {
+  selectVal.value = newVal
+})
+
 onMounted(() => {
-  console.log(select.value?.selectedIndex);
-  if (sessionStorage.getItem(`${props.type}Type`)) {
-    console.log(111111)
-    selectVal.value = sessionStorage.getItem(`${props.type}Type`)
-  } else {
-    selectVal.value = props.option[0].value
-  }
-  emit("update:modelValue", selectVal.value);
+  // selectVal.value = props.modelValue
+  // console.log(select.value?.selectedIndex);
+  // if (sessionStorage.getItem(`${props.type}Type`)) {
+  //   console.log(111111)
+  //   selectVal.value = sessionStorage.getItem(`${props.type}Type`)
+  // } else {
+  //   selectVal.value = props.modelValue || props.option[0].value  
+  // }
+  // emit("update:modelValue", selectVal.value);
 });
 
 const change = (e: any) => {
   selectVal.value = e.target.value
-  sessionStorage.setItem(`${props.type}Type`, selectVal.value)
+  // sessionStorage.setItem(`${props.type}Type`, selectVal.value)
   emit("update:modelValue", selectVal.value);
 };
 </script>

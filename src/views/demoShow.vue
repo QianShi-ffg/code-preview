@@ -23,7 +23,6 @@
               :language="htmlSelectVal"
               v-model="content.html"
               v-model:is-error="htmlIsError"
-              v-if="content.html !== null"
             />
           </div>
           <splitMove direction="horizontal"></splitMove>
@@ -41,7 +40,6 @@
               :language="cssSelectVal"
               v-model="content.css"
               v-model:is-error="cssIsError"
-              v-if="content.css !== null"
             />
           </div>
           <splitMove direction="horizontal"></splitMove>
@@ -59,7 +57,6 @@
               :language="jsSelectVal"
               v-model="content.js"
               v-model:is-error="jsIsError"
-              v-if="content.js !== null"
             />
           </div>
         </div>
@@ -77,7 +74,6 @@ import { ref, reactive, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import selectVue from "../components/select.vue";
 import loadingHook from "../hooks/loadingHook";
-import { getDemoItem } from "@/api/api";
 import * as sass from "sass";
 import useSwitchLanguage from '@/hooks/switchLanguage';
 
@@ -93,9 +89,9 @@ const editorList = ref<Element | Node | undefined>();
 
 const preview = ref<any>();
 const content = reactive<any>({
-  html: null,
-  css: null,
-  js: null,
+  html: '',
+  css: '',
+  js: '',
 });
 
 const htmlSelectVal = ref<string>('');
@@ -130,25 +126,13 @@ const jsIsError = ref<boolean>(false);
 
 loadingHook.value = true;
 onMounted(() => {
+  htmlSelectVal.value = "html";
+  cssSelectVal.value = "css";
+  jsSelectVal.value = "javascript";
   setTimeout(() => {
     loadingHook.value = false;
-    init()
   }, 4000);
 });
-
-const initDemo = async () => {
-  const res: any = await getDemoItem({ id: route.query.id });
-  if (res.code === 200) {
-    console.log(res.data);
-    content.html = res.data.html || '';
-    content.css = res.data.css || '';
-    content.js = res.data.javascript || '';
-    htmlSelectVal.value = res.data.htmlLanguage || "html";
-    cssSelectVal.value = res.data.cssLanguage || "css";
-    jsSelectVal.value = res.data.jsLanguage || "javascript";
-  }
-};
-initDemo();
 
 const init = async() => {
   console.log(

@@ -27,8 +27,8 @@ export default defineConfig({
     open: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:8001',
-        // target: 'https://oss.xingyijun.cn',
+        // target: 'http://localhost:8001',
+        target: 'http://111.229.124.159:3055',
         rewrite: (path) => path.replace(/^\/api/, ''),
         changeOrigin: true
       }

@@ -107,7 +107,7 @@ const init = async() => {
     max-width: 1280px;
     min-width: 755px;
     display: grid;
-    grid-template-columns: repeat(auto-fill, 230px);
+    grid-template-columns: repeat(auto-fill, 295px);
     grid-row-gap: 40px;
     grid-column-gap: 32px;
     width: 100%;
@@ -120,7 +120,7 @@ const init = async() => {
       width: 100%;
       height: 120px;
       border-radius: 15px;
-      background-color: #3dcfbc3f;
+      background-color: #965de63f;
       transition: all 0.3s;
       font-size: 26px;
       font-family: math;
@@ -143,7 +143,7 @@ const init = async() => {
       }
 
       &:hover {
-        box-shadow: 0 0 10px 1px #6dcabc;
+        box-shadow: 0 0 10px 1px #965de6;
         font-size: 30px;
 
         &::after {
