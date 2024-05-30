@@ -111,6 +111,9 @@ export class Request {
   public put(url: string, config: AxiosRequestConfig): Promise<AxiosResponse> {
     return this.instance.put(url, config)
   }
+  public patch(url: string, config: AxiosRequestConfig): Promise<AxiosResponse> {
+    return this.instance.patch(url, config)
+  }
   public delete(url: string, config: AxiosRequestConfig): Promise<AxiosResponse> {
     return this.instance.delete(url, config)
   }

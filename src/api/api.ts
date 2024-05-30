@@ -1,6 +1,15 @@
 import axios from './index'
 
 // console.log(import.meta.env.VITE_BASE_URL, 8999)
+// 保存demo
+export const saveDemoList = (params: object) => {
+  return axios.post( '/demo', params)
+}
+// 更新demo
+export const updateDemoList = (params: any) => {
+  console.log(params)
+  return axios.patch( `/demo/${params.id}`, params.data)
+}
 // demo列表
 export const getDemoList = (params: object) => {
   return axios.get( '/demo', { params })

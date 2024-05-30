@@ -2,7 +2,11 @@
   <div class="demoDetail">
     <header class="header">
       <div class="goHome" title="GoHome" @click="backToHome">GoHome</div>
-      <button @click="init" class="runBtn">运 行</button>
+      <input type="text" v-model="content.name" class="name">
+      <div class="btnList">
+        <button @click="save" class="runBtn">保 存</button>
+        <button @click="init" class="runBtn">运 行</button>
+      </div>
     </header>
     <main class="main">
       <!-- <router-view></router-view> -->
@@ -55,7 +59,7 @@
             </div>
             <Editor
               :language="jsSelectVal"
-              v-model="content.js"
+              v-model="content.javascript"
               v-model:is-error="jsIsError"
             />
           </div>
@@ -74,8 +78,8 @@ import { ref, reactive, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import selectVue from "../components/select.vue";
 import loadingHook from "../hooks/loadingHook";
-import * as sass from "sass";
 import useSwitchLanguage from '@/hooks/switchLanguage';
+import { saveDemoList } from '@/api/api';
 
 const router = useRouter();
 const route = useRoute();
@@ -92,6 +96,7 @@ const content = reactive<any>({
   html: '',
   css: '',
   js: '',
+  name: ''
 });
 
 const htmlSelectVal = ref<string>('');
@@ -149,7 +154,7 @@ const init = async() => {
       iframe?.contentDocument || iframe?.contentWindow?.document;
     iframeDoc?.open();
     // 构建内容
-    let iframeContent = `${content.html}<style>${newCssVal}</style><script>${content.js}<\/script>`;
+    let iframeContent = `${content.html}<style>${newCssVal}</style><script>${content.javascript}<\/script>`;
     iframeDoc?.write(iframeContent);
     iframeDoc?.close();
   } else {
@@ -164,6 +169,11 @@ const init = async() => {
     }
   }
 };
+
+const save = async () => {
+  const res = await saveDemoList(content)
+  console.log(res)
+}
 </script>
 
 <style scoped lang="scss">
@@ -173,13 +183,36 @@ const init = async() => {
   overflow: hidden;
 
   .header {
+    position: relative;
     display: flex;
     align-items: center;
     width: 100%;
     height: 64px;
     border-bottom: 1px solid #f8f8f8;
     box-sizing: border-box;
-
+    .name {
+      position: absolute;
+      inset: 0;
+      margin: auto;
+      width: 450px;
+      height: 34px;
+      border: 1px solid #c9c9ea;
+      border-radius: 10px;
+      padding: 0 5px;
+      font-size: 16px;
+      text-align: center;
+      transition: all 0.3s;
+      &:focus-visible {
+        outline: none;
+        // border: 1px solid #c9c9ea;
+      }
+      &:focus {
+        box-shadow: 0 0 3px 1px #bfbfe7;
+      }
+      &:hover {
+        box-shadow: 0 0 3px 1px #bfbfe7;
+      }
+    }
     .goHome {
       padding: 1px 15px 1px 5px;
       position: relative;
@@ -215,30 +248,31 @@ const init = async() => {
         color: transparent;
       }
     }
-
-    .runBtn {
+    .btnList {
       position: absolute;
       right: 30px;
       display: inline-block;
-      width: 80px;
-      height: 32px;
-      border: none;
-      // background: #c9c9ea;
-      border-radius: 6px;
-      box-shadow: 0 0 5px 0 inset #a174e7;
-      cursor: pointer;
-      transition: box-shadow 0.4s, translateY 0.2s;
-      color: #a174e7;
-
-      &:hover {
-        box-shadow: 0 0 5px 0 inset #c9c9ea, 0 0 10px 5px inset #a174e7,
-          0 0 3px 0px #a174e7;
-        // background: radial-gradient(#c9c9ea, #a174e7);
-      }
-
-      &:active {
-        transform: scale(1.05);
-        // background: radial-gradient(#c9c9ea, #a174e7);
+      .runBtn {
+        width: 80px;
+        height: 32px;
+        border: none;
+        // background: #c9c9ea;
+        border-radius: 6px;
+        box-shadow: 0 0 5px 0 inset #a174e7;
+        cursor: pointer;
+        transition: box-shadow 0.4s, translateY 0.2s;
+        color: #a174e7;
+        margin-left: 10px;
+        &:hover {
+          box-shadow: 0 0 5px 0 inset #c9c9ea, 0 0 10px 5px inset #a174e7,
+            0 0 3px 0px #a174e7;
+          // background: radial-gradient(#c9c9ea, #a174e7);
+        }
+  
+        &:active {
+          transform: scale(1.05);
+          // background: radial-gradient(#c9c9ea, #a174e7);
+        }
       }
     }
   }
