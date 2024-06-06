@@ -1,6 +1,10 @@
 import axios from './index'
 
 // console.log(import.meta.env.VITE_BASE_URL, 8999)
+// 登录
+export const login = (params: object) => {
+  return axios.get( '/user/login', { params })
+}
 // 保存demo
 export const saveDemoList = (params: object) => {
   return axios.post( '/demo', params)

@@ -1,5 +1,9 @@
 <template>
   <div id="home">
+    <div class="header">
+      <div class="user" v-if="userStore.getUserInfo?.id">{{ userStore.getUserInfo?.userName }}</div>
+      <div class="user" v-else @click="goToLogin()">登录</div>
+    </div>
     <nav
       @click="
         () => {
@@ -29,15 +33,16 @@
     </div>
   </div>
 </template>
-
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import loadingHook from './hooks/loadingHook';
 import { getDemoList } from '@/api/api';
+import { useUserStore } from '@/store/index'
 
 const router = useRouter();
-const demoList = ref<any>([]);
+const demoList = ref<any>([]); 
+const userStore = useUserStore()
 
 onMounted(() => {
   setTimeout(() => {
@@ -59,8 +64,12 @@ const init = async() => {
     demoList.value = res.data
   }
 }
-</script>
 
+const goToLogin = () => {
+  loadingHook.value = false
+  router.push('/login')
+}
+</script>
 <style scoped lang="scss">
 #home {
   display: flex;
@@ -70,6 +79,24 @@ const init = async() => {
   min-height: 500px;
   height: auto;
   width: 100%;
+  .header {
+    display: flex;
+    align-items: center;
+    height: 100px;
+    width: 100%;
+    padding: 0 80px;
+    box-sizing: border-box;
+    .user {
+      font-size: 20px;
+      font-weight: 700;
+      color: #965de6;
+      cursor: pointer;
+      transition: all 0.3s;
+      &:hover {
+        filter: brightness(1.3);
+      }
+    }
+  }
 
   .nav {
     position: relative;

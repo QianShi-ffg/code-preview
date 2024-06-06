@@ -4,7 +4,7 @@
       <div class="goHome" title="GoHome" @click="backToHome">GoHome</div>
       <input type="text" v-model="content.name" class="name">
       <div class="btnList">
-        <button @click="update" class="runBtn">更 新</button>
+        <button @click="update" class="runBtn" v-if="userStore.getUserInfo.id && userStore.getUserInfo.id === currentUserId">更 新</button>
         <button @click="init" class="runBtn">运 行</button>
       </div>
     </header>
@@ -83,9 +83,11 @@ import selectVue from "../components/select.vue";
 import loadingHook from "../hooks/loadingHook";
 import { getDemoItem, updateDemoList } from "@/api/api";
 import useSwitchLanguage from '@/hooks/switchLanguage';
+import { useUserStore } from '@/store/index'
 
 const router = useRouter();
 const route = useRoute();
+const userStore = useUserStore()
 const { switchCss } = useSwitchLanguage()
 
 const backToHome = () => {
@@ -132,6 +134,8 @@ const cssIsError = ref<boolean>(false);
 const htmlIsError = ref<boolean>(false);
 const jsIsError = ref<boolean>(false);
 
+const currentUserId = ref<any>('');
+
 loadingHook.value = true;
 onMounted(() => {
   setTimeout(() => {
@@ -151,6 +155,7 @@ const initDemo = async () => {
     htmlSelectVal.value = res.data.htmlLanguage || "html";
     cssSelectVal.value = res.data.cssLanguage || "css";
     jsSelectVal.value = res.data.jsLanguage || "javascript";
+    currentUserId.value = res.data.userId
   }
 };
 initDemo();
@@ -187,7 +192,7 @@ const init = async() => {
 };
 
 const update = async () => {
-  const res = await updateDemoList({id: route.query.id, data: content})
+  const res = await updateDemoList({id: route.query.id, data: content, userId: userStore.getUserInfo.id})
   console.log(res)
 }
 </script>

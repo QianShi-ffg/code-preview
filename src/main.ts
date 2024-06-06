@@ -2,6 +2,8 @@ import { createApp } from "vue";
 import "./style.css";
 import App from "./App.vue";
 import Router from "./router/index";
+import { store } from './store/index';
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 
 import jsonWorker from "monaco-editor/esm/vs/language/json/json.worker?worker";
 import cssWorker from "monaco-editor/esm/vs/language/css/css.worker?worker";
@@ -36,7 +38,9 @@ const app: any = createApp(App);
 //   menusEvent(event, menus);
 // };
 // app.config.globalProperties.$message = kitsIcon.message;
+store.use(piniaPluginPersistedstate)
 app.use(Router);
+app.use(store);
 // 注册组件
 // app.use(kitsUI);
 app.mount("#app");

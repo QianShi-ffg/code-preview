@@ -80,7 +80,9 @@ import selectVue from "../components/select.vue";
 import loadingHook from "../hooks/loadingHook";
 import useSwitchLanguage from '@/hooks/switchLanguage';
 import { saveDemoList } from '@/api/api';
+import { useUserStore } from '@/store/index'
 
+const userStore = useUserStore()
 const router = useRouter();
 const route = useRoute();
 const { switchCss } = useSwitchLanguage()
@@ -171,8 +173,13 @@ const init = async() => {
 };
 
 const save = async () => {
-  const res = await saveDemoList(content)
-  console.log(res)
+  if (userStore.getUserInfo && userStore.getUserInfo.id) {
+    const res = await saveDemoList(Object.assign(content, { userId: userStore.getUserInfo.id }))
+    console.log(res)
+  } else {
+    alert('请先登录')
+    router.push('/login')
+  }
 }
 </script>
 
