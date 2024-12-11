@@ -22,9 +22,10 @@ export const getDemoList = (params: object) => {
 export const getDemoItem = (params: any) => {
   return axios.get( `/demo/${params.id}`, {})
 }
-
-// 友链列表单个刷新
-export const setRefreshScreenShot = (params: object) => {
-  return axios.post( '/refreshScreenShot', params)
+// 运行转换
+export const getRunning = (params: object) => {
+  return axios.post( `/demo/running`, params)
 }
+
+
 

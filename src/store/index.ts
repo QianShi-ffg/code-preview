@@ -1,12 +1,21 @@
 import { defineStore, createPinia } from 'pinia';
+
+interface userInfo {
+  id?: string | number | undefined;
+  userName?: string | undefined
+}
+interface State {
+  userInfo: userInfo;
+}
+
 export const useUserStore = defineStore('user', {
-  state: ()=> {
+  state: (): State => {
     return {
       userInfo: {}
     }
   },
   getters: {
-    getUserInfo: (state) => {
+    getUserInfo: (state): userInfo => {
       return state.userInfo
     },
   },

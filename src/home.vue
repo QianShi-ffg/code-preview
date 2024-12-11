@@ -45,9 +45,6 @@ const demoList = ref<any>([]);
 const userStore = useUserStore()
 
 onMounted(() => {
-  setTimeout(() => {
-    loadingHook.value = false
-  }, 4000)
 });
 
 const jumpTo = (value: any) => {
@@ -59,9 +56,26 @@ onMounted(() => {
 })
 
 const init = async() => {
-  const res: any = await getDemoList({});
-  if (res.code === 200) {
-    demoList.value = res.data
+  try {
+    const res: any = await getDemoList({});
+    if (res.code === 200) {
+      demoList.value = res.data
+    } else {
+      demoList.value = []
+    }
+    setTimeout(() => {
+      console.log(45454545)
+      loadingHook.value = false
+      return
+    }, 4000)
+  } catch (error) {
+    console.log(error, 'errorerrorerror')
+  } finally {
+    setTimeout(() => {
+      console.log(45454545)
+      loadingHook.value = false
+      return
+    }, 4000)
   }
 }
 

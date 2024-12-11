@@ -1,5 +1,5 @@
 <template>
-  <div class="loading" v-if="true">
+  <div class="loading" v-if="loadingVal">
     <div class="wrapper">
       <div class="circle"></div>
       <div class="circle"></div>
