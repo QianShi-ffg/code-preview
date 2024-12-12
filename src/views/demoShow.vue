@@ -157,13 +157,17 @@ const init = async() => {
       iframe?.contentDocument || iframe?.contentWindow?.document;
     iframeDoc?.open();
     // 构建内容
-    const res:any = await getRunning(content)
-    if (res.code === 200) {
-      content.js = res.data[0].javascript.code
-    } else {
+    try {
+      const res:any = await getRunning(content)
+      if (res.code === 200) {
+        content.js = res.data[0].javascript.code
+      } else {
+        content.js = content.javascript
+      }
+    } catch (error) {
       content.js = content.javascript
     }
-    let iframeContent = `${content.html}<style>${newCssVal}</style><script type="module">${content.js}<\/script>`;
+    let iframeContent = `${content.html}<style>${content.style}</style><script type="module">${content.js}<\/script>`;
     iframeDoc?.write(iframeContent);
     iframeDoc?.close();
   } else {

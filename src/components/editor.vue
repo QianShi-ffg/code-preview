@@ -87,67 +87,83 @@ watch(
 const init = () => {
   // 在 Monaco Editor 脚本加载后初始化编辑器
   // require(["vs/editor/editor.main"], (monaco: any) => {
-    monacoRef.value = monaco;
-    monacoDiffInstance.value = monaco.editor.create(
-      editorBox.value,
-      defaultOpts
-    );
-    monaco.editor.defineTheme("myTheme", {
-      base: "vs",
-      inherit: true,
-      rules: [],
-      colors: {
-        "editor.foreground": "#000000",
-        "editor.background": "#f8f8f8",
-        "editorCursor.foreground": "#8B0000",
-        "editor.lineHighlightBackground": "#0000FF20",
-        "editorLineNumber.foreground": "#008800",
-        "editor.selectionBackground": "#88000030",
-        "editor.inactiveSelectionBackground": "#88000015",
-      },
-    });
-    // 设置主题
-    monaco.editor.setTheme("myTheme");
+  monacoRef.value = monaco;
+  monacoDiffInstance.value = monaco.editor.create(editorBox.value, defaultOpts);
 
-    // 实时获取内容变更
-    monacoDiffInstance.value.onDidChangeModelContent((e: any) => {
-      contentChanged.value = true;
-      console.log(e);
-      const content = toRaw(monacoDiffInstance.value)?.getValue();
-      emits("update:modelValue", content);
-    });
+  // monaco.editor.setModelMarkers(
+  //   toRaw(monacoDiffInstance.value).getModel(),
+  //   "owner",
+  //   []
+  // );
 
-    // 实时获取编辑器错误信息
-    monaco.editor.onDidChangeMarkers(() => {
-      const markers = monaco.editor.getModelMarkers({
-        resource: toRaw(monacoDiffInstance.value).getModel()?.uri,
-      });
-      // 当前错误与警告信息
-      // const markers = monaco.editor.getModelMarkers({ owner: 'owner' });
-      // markers.forEach((marker: any) => {
-      //   if (marker.severity === monaco.MarkerSeverity.Error) {
-      //     console.log(`Error: ${marker.message} at line ${marker.startLineNumber}`);
-      //   } else if (marker.severity === monaco.MarkerSeverity.Warning) {
-      //     console.log(`Warning: ${marker.message} at line ${marker.startLineNumber}`);
-      //   }
-      // });
-      // 判断当前是否存在语法错误
-      const newMarkers = markers.filter((item: any) => {
-        console.log(item);
-        return item.severity === monaco.MarkerSeverity.Error;
-      });
-      if (newMarkers.length > 0) {
-        console.log(
-          newMarkers,
-          props.language,
-          "newMarkersnewMarkersnewMarkersnewMarkersnewMarkersnewMarkers"
-        );
-        emits("update:isError", true);
-      } else {
-        emits("update:isError", false);
-      }
-      // markers是返回的错误信息数组，可赋值给需要判断语法错误的关键词，如this.coderErrors = markers
+  monaco.editor.defineTheme("myTheme", {
+    base: "vs",
+    inherit: true,
+    rules: [],
+    colors: {
+      "editor.foreground": "#000000",
+      "editor.background": "#f8f8f8",
+      "editorCursor.foreground": "#8B0000",
+      "editor.lineHighlightBackground": "#0000FF20",
+      "editorLineNumber.foreground": "#008800",
+      "editor.selectionBackground": "#88000030",
+      "editor.inactiveSelectionBackground": "#88000015",
+    },
+  });
+  // 设置主题
+  monaco.editor.setTheme("myTheme");
+
+  // 实时获取内容变更
+  monacoDiffInstance.value.onDidChangeModelContent((e: any) => {
+    contentChanged.value = true;
+    console.log(e);
+    const content = toRaw(monacoDiffInstance.value)?.getValue();
+    emits("update:modelValue", content);
+  });
+  // 去除规则校验
+  monaco.languages.css.cssDefaults.setOptions({
+    validate: false
+  });
+  monaco.languages.css.scssDefaults.setOptions({
+    validate: false
+  });
+
+  monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+      noSemanticValidation: true,
+      noSyntaxValidation: true
+  });
+  
+  // 实时获取编辑器错误信息
+  monaco.editor.onDidChangeMarkers(() => {
+    const markers = monaco.editor.getModelMarkers({
+      resource: toRaw(monacoDiffInstance.value).getModel()?.uri,
     });
+    // 当前错误与警告信息
+    // const markers = monaco.editor.getModelMarkers({ owner: 'owner' });
+    // markers.forEach((marker: any) => {
+    //   if (marker.severity === monaco.MarkerSeverity.Error) {
+    //     console.log(`Error: ${marker.message} at line ${marker.startLineNumber}`);
+    //   } else if (marker.severity === monaco.MarkerSeverity.Warning) {
+    //     console.log(`Warning: ${marker.message} at line ${marker.startLineNumber}`);
+    //   }
+    // });
+    // 判断当前是否存在语法错误
+    const newMarkers = markers.filter((item: any) => {
+      console.log(item);
+      return item.severity === monaco.MarkerSeverity.Error;
+    });
+    if (newMarkers.length > 0) {
+      console.log(
+        newMarkers,
+        props.language,
+        "newMarkersnewMarkersnewMarkersnewMarkersnewMarkersnewMarkers"
+      );
+      emits("update:isError", true);
+    } else {
+      emits("update:isError", false);
+    }
+    // markers是返回的错误信息数组，可赋值给需要判断语法错误的关键词，如this.coderErrors = markers
+  });
   // });
 };
 </script>

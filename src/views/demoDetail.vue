@@ -81,7 +81,7 @@ import { ref, reactive, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import selectVue from "../components/select.vue";
 import loadingHook from "../hooks/loadingHook";
-import { getDemoItem, updateDemoList } from "@/api/api";
+import { getDemoItem, updateDemoList, getRunning } from "@/api/api";
 import useSwitchLanguage from '@/hooks/switchLanguage';
 import { useUserStore } from '@/store/index'
 
@@ -101,6 +101,7 @@ const content = reactive<any>({
   html: null,
   css: null,
   javascript: null,
+  js: null,
   name: null,
 });
 
@@ -175,7 +176,18 @@ const init = async() => {
       iframe?.contentDocument || iframe?.contentWindow?.document;
     iframeDoc?.open();
     // 构建内容
-    let iframeContent = `${content.html}<style>${newCssVal}</style><script>${content.javascript}<\/script>`;
+        // 构建内容
+    try {
+      const res:any = await getRunning(content)
+      if (res.code === 200) {
+        content.js = res.data[0].javascript.code
+      } else {
+        content.js = content.javascript
+      }
+    } catch (error) {
+      content.js = content.javascript
+    }
+    let iframeContent = `${content.html}<style>${newCssVal}</style><script type="module">${content.javascript}<\/script>`;
     iframeDoc?.write(iframeContent);
     iframeDoc?.close();
   } else {
